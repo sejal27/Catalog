@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block content %}
+<!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
+  <script src="//apis.google.com/js/platform.js?onload=start"> </script>
+<!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
+
+<div class="container">
+  <br>
+  <!-- GOOGLE PLUS SIGN IN-->
+  <div id="signInButton">
+    <span class="g-signin"
+      data-scope="openid email"
+      data-clientid="370385457738-99matjqs5cm40163fltj1tbr3m6gin8n.apps.googleusercontent.com"
+      data-redirecturi="postmessage"
+      data-accesstype="offline"
+      data-cookiepolicy="single_host_origin"
+      data-callback="signInCallback"
+      data-approvalprompt="force">
+    </span>
+  </div>
+
+  <div class="col s12 m12" id="result"></div>
+
+  <script>
+  function signInCallback(authResult) {
+    if (authResult['code']) {
+
+      // Hide the sign-in button now that the user is authorized
+      $('#signinButton').attr('style', 'display: none');
+
+      // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
+      $.ajax({
+        type: 'POST',
+        url: '/gconnect?state={{STATE}}',
+        processData: false,
+        data: authResult['code'],
+        contentType: 'application/octet-stream; charset=utf-8',
+        success: function(result) {
+          // Handle or verify the server response if necessary.
+          if (result) {
+            $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+           setTimeout(function() {
+            window.location.href = "/home";
+           }, 4000);
+            
+
+          } else if (authResult['error']) {
+
+                console.log('There was an error: ' + authResult['error']);
+              } else {
+                  $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+             }
+        }
+    }); } }
+  </script>
+<!--END GOOGLE PLUS SIGN IN -->
+
+<!--FACEBOOK SIGN IN -->
+<script>
+  window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '216309015530225',
+    cookie     : true,  // enable cookies to allow the server to access 
+                        // the session
+    xfbml      : true,  // parse social plugins on this page
+    version    : 'v2.9' // use version 2.9
+  });
+    FB.AppEvents.logPageView();   
+  };
+
+  // Load the SDK asynchronously
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+  // Here we run a very simple test of the Graph API after login is
+  // successful.  See statusChangeCallback() for when this call is made.
+
+  function fb_login() {
+    FB.login(function (response) {
+        if (response.authResponse) {
+            console.log('Welcome!  Fetching your information.... ');
+            console.log(response); // dump complete info
+            access_token = response.authResponse.accessToken; //get access token
+            // user_id = response.authResponse.userID; //get FB UID
+
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+     $.ajax({
+      type: 'POST',
+      url: '/fbconnect?state={{STATE}}',
+      processData: false,
+      data: access_token,
+      contentType: 'application/octet-stream; charset=utf-8',
+      success: function(result) {
+        // Handle or verify the server response if necessary.
+        if (result) {
+          $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+         setTimeout(function() {
+          window.location.href = "/home";
+         }, 4000);
+      } else {
+        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+         }
+      } 
+  });
+    });
+}});}
+</script>
+
+  <fb:login-button scope="public_profile,email" onlogin="fb_login();">
+    <a href='javascript:fb_login()'></a>
+  </fb:login-button>
+
+<!--END FACEBOOK SIGN IN -->
+
+</div>
+{% endblock %}

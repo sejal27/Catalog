@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+
+<script>
+   $( document ).ready(function(){
+    $('select').material_select();       
+})
+</script>
+
+<h2>Add a New Item</h2>
+
+<form action='#' method='post'>
+    <div class="input-field">
+    <input type="text" class="validate" name="title" placeholder="Item Title"></div>
+    <div class="input-field">
+    <textarea class="materialize-textarea" name="description" maxlength="250" rows="3" placeholder="Item Description"></textarea></div>
+    <div class="input-field">
+    <select name="category">
+        {% for c in categories %}
+            <option value={{c.id}}>{{c.name}}</option>
+        {% endfor %}
+    </select></div>
+    <input class="waves-effect waves-light btn" type="submit" value="Create" name="create_action">
+    <input class="waves-effect waves-light btn" type="submit" value="Cancel" name="create_action">
+</form>
+
+{% endblock %}
