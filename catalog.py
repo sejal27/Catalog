@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, make_response
+from flask import Flask, render_template, request, redirect, jsonify, \
+    url_for, flash, make_response
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Item, User
@@ -7,7 +8,8 @@ import json
 import random
 import string
 from flask import session as login_session
-from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
+from oauth2client.client import flow_from_clientsecrets, \
+    FlowExchangeError
 import httplib2
 
 # Initial configuration - create SQLAlchemy session
@@ -65,6 +67,7 @@ def showCategory(category_id):
 
 # Add a new item
 
+
 @app.route('/category/new', methods=['GET', 'POST'])
 def addCategory():
     if 'username' not in login_session:
@@ -81,6 +84,7 @@ def addCategory():
         return redirect(url_for('homePage'))
     else:
         return render_template('newcategory.html')
+
 
 @app.route('/item/new', methods=['GET', 'POST'])
 def addItem():
@@ -123,7 +127,9 @@ def editItem(item_id):
         return redirect(url_for('showLogin'))
     item = session.query(Item).filter_by(id=item_id).one()
     categories = session.query(Category).all()
-
+    if item.user_id != login_session['user_id']:
+        return "<script>function myFunction() {alert('You are not authorized to\
+         edit this item.');}</script><body onload='myFunction()''>"
     if request.method == 'GET':
         return render_template(
             'edititem.html',
@@ -148,7 +154,9 @@ def deleteItem(item_id):
     if 'username' not in login_session:
         return redirect(url_for('showLogin'))
     item = session.query(Item).filter_by(id=item_id).one()
-
+    if item.user_id != login_session['user_id']:
+        return "<script>function myFunction() {alert('You are not authorized to\
+         delete this item.');}</script><body onload='myFunction()''>"
     if request.method == 'POST':
         delete_action = request.form['delete_action']
         print delete_action
@@ -292,7 +300,8 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;\
+    -webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -340,8 +349,8 @@ def gdisconnect():
             json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session.get(
-        'access_token')
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' \
+        % login_session.get('access_token')
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print 'result is '
@@ -380,8 +389,9 @@ def fbconnect():
         'web']['app_id']
     app_secret = json.loads(
         open('fb_client_secrets.json', 'r').read())['web']['app_secret']
-    url = 'https://graph.facebook.com/v2.8/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
-        app_id, app_secret, access_token)
+    url = 'https://graph.facebook.com/v2.8/oauth/access_token?grant_type=\
+    fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
+                                            app_id, app_secret, access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
 
@@ -407,7 +417,8 @@ def fbconnect():
     login_session['access_token'] = stored_token
 
     # Get user picture
-    url = 'https://graph.facebook.com/v2.9/me/picture?%s&redirect=0&height=200&width=200' % token
+    url = 'https://graph.facebook.com/v2.9/me/picture?%s&redirect=0&height=\
+    200&width=200' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
@@ -427,7 +438,8 @@ def fbconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;\
+    -webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
 
     flash("Now logged in as %s" % login_session['username'])
     return output
