@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<div class = 'flash'>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul>
+      {% for message in messages %}
+          <li> <strong> {{ message }} </strong> </li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+</div>
+
+<div class="items">
+
+  <h2>Latest Items</h2>
+  <div class="row">
+  {% for i in items %}
+        <div class="col s6 m4">
+        <a href="{{url_for('showItem', item_id=i.id)}}">
+          <div class="card-panel teal hoverable">
+            <span class="white-text center-align">
+                {{i.title}}
+                ({{i.name}})
+            </span>
+          </div></a>
+        </div>
+  {% endfor %}   
+  </div  
+
+</div>
+
+{% endblock %}

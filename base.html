@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>
+       <!--  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"> -->
+       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+       <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
+        <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+
+    </head>
+    <body>
+        <ul id="categories" class="dropdown-content">
+            {% for c in categories %}
+                <li><a href="{{url_for('showCategory', category_id=c.id)}}">{{c.name}}</a></li>
+            {% endfor %}
+        </ul>
+
+        <ul id="add" class="dropdown-content">
+          <li><a href="{{url_for('addItem')}}">Add Item</a></li>
+          <li><a href="{{url_for('addCategory')}}">Add Category</a></li>
+        </ul>
+
+        <nav>
+          <div class="nav-wrapper">
+            <a href="{{url_for('homePage')}}" class="brand-logo center">Catalog</a>
+            <ul class="right hide-on-med-and-down">
+              <!-- Dropdown Trigger -->
+              {%if 'username' in session %}
+                <li><a class="dropdown-button btn-floating btn-small waves-effect waves-light red" href="#!" data-activates="add"><i class="material-icons">add</i><i class="material-icons right">arrow_drop_down</i></a></li>
+              {% endif %}
+
+              <li><a class="dropdown-button" href="#!" data-activates="categories">Categories<i class="material-icons right">arrow_drop_down</i></a></li>
+              <li>{{session.username}}</li>
+              <li>
+              {%if 'username' not in session %}
+                  <a href="{{url_for('showLogin')}}">Login </a>
+                  {% else %}
+                  <a href="{{url_for('disconnect')}}">Logout </a>
+              {% endif %}
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <script>
+           $( document ).ready(function(){
+            $(".dropdown-button").dropdown();
+           })
+        </script>
+
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </body>
+</html>

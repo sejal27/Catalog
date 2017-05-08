@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<script>
+   $( document ).ready(function(){
+    $('select').material_select();       
+})
+</script>
+<h2>Edit Item: {{item.title}}</h2>
+<form action='#' method='post'>
+    <div class="input-field">
+    <input type="text" name="title" value="{{item.title}}" placeholder="Item Title" required></div>
+    <div class="input-field">
+    <textarea name="description" maxlength="250" rows="3" placeholder="Item Description">{{item.description}}</textarea></div>
+    <div class="input-field">
+    <select name="category">
+        {% for c in categories %}
+            {% if c.id == item.category_id %}
+                <option value="{{c.id}}" selected>{{c.name}}</option>
+            }
+            {% else %}
+                <option value="{{c.id}}">{{c.name}}</option>
+            }
+            {% endif %}
+        {% endfor %}
+    </select></div>
+    <input class="waves-effect waves-light btn" type="submit" value="Save" name="edit_action">
+    <input class="waves-effect waves-light btn" type="submit" value="Cancel" name="edit_action">
+
+</form>
+{% endblock %}
