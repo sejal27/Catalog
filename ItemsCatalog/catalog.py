@@ -11,6 +11,8 @@ from flask import session as login_session
 from oauth2client.client import flow_from_clientsecrets, \
     FlowExchangeError
 import httplib2
+from functools import wraps
+
 
 # Initial configuration - create SQLAlchemy session
 
@@ -25,7 +27,18 @@ app = Flask(__name__)
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "catalog_app"
+ 
 
+# Decorator function to check if the user is logged in
+
+
+def login_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if 'username' not in login_session:
+            return redirect('/login')
+        return f(*args, **kwargs)
+    return wrapper
 # Home page handler - displays category list and latest items
 
 
@@ -69,9 +82,8 @@ def showCategory(category_id):
 
 
 @app.route('/category/new', methods=['GET', 'POST'])
+@login_required
 def addCategory():
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
     if request.method == 'POST':
         print "post method for add category"
         create_action = request.form['create_action']
@@ -87,9 +99,8 @@ def addCategory():
 
 
 @app.route('/item/new', methods=['GET', 'POST'])
+@login_required
 def addItem():
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
     categories = session.query(Category).all()
     if request.method == 'POST':
         create_action = request.form['create_action']
@@ -122,9 +133,8 @@ def showItem(item_id, del_mode='False'):
 
 
 @app.route('/item/<int:item_id>/edit/', methods=['GET', 'POST'])
+@login_required
 def editItem(item_id):
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
     item = session.query(Item).filter_by(id=item_id).one()
     categories = session.query(Category).all()
     if item.user_id != login_session['user_id']:
@@ -150,9 +160,8 @@ def editItem(item_id):
 
 
 @app.route('/item/<int:item_id>/delete/', methods=['POST', 'GET'])
+@login_required
 def deleteItem(item_id):
-    if 'username' not in login_session:
-        return redirect(url_for('showLogin'))
     item = session.query(Item).filter_by(id=item_id).one()
     if item.user_id != login_session['user_id']:
         return "<script>function myFunction() {alert('You are not authorized to\
