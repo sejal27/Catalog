@@ -16,13 +16,19 @@
                 <li><a href="{{url_for('showCategory', category_id=c.id)}}">{{c.name}}</a></li>
             {% endfor %}
         </ul>
+
+        <ul id="add" class="dropdown-content">
+          <li><a href="{{url_for('addItem')}}">Add Item</a></li>
+          <li><a href="{{url_for('addCategory')}}">Add Category</a></li>
+        </ul>
+
         <nav>
           <div class="nav-wrapper">
             <a href="{{url_for('homePage')}}" class="brand-logo center">Catalog</a>
             <ul class="right hide-on-med-and-down">
               <!-- Dropdown Trigger -->
               {%if 'username' in session %}
-                <li><a class="btn-floating btn-small waves-effect waves-light red" href="{{url_for('addItem')}}"><i class="material-icons">add</i></a></li>
+                <li><a class="dropdown-button btn-floating btn-small waves-effect waves-light red" href="#!" data-activates="add"><i class="material-icons">add</i><i class="material-icons right">arrow_drop_down</i></a></li>
               {% endif %}
 
               <li><a class="dropdown-button" href="#!" data-activates="categories">Categories<i class="material-icons right">arrow_drop_down</i></a></li>
